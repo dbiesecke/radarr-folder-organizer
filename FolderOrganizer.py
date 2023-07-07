@@ -130,7 +130,7 @@ def change_movie_path_and_folder(movie_info, new_path, new_folder_name):
     old_path = movie_info[PATH]
     movie_info[PATH] = new_path
     movie_info[FOLDER_NAME] = new_folder_name
-    update_response = radarr_session.put('{0}/api/movie/{1}'.format(radarr_url, movie_id),
+    update_response = radarr_session.put('{0}/api/v3/movie/{1}'.format(radarr_url, movie_id),
                                          data=json.dumps(movie_info))
     movie_title = movie_info["title"]
     if update_response.status_code < 300:
@@ -149,7 +149,7 @@ def refresh_movie(movie_info):
         "Waiting {}s before refreshing movie {}, so Radarr has enough time to get the change".format(sleep_time,
                                                                                                      movie_title))
     time.sleep(sleep_time)
-    refresh_response = radarr_session.post("{0}/api/command".format(radarr_url),
+    refresh_response = radarr_session.post("{0}/api/v3/command".format(radarr_url),
                                            data=json.dumps(command))
     if refresh_response.status_code < 300:
         logger.debug("Movie {} refreshed succesfully".format(movie_title))
@@ -201,7 +201,7 @@ radarr_session = requests.Session()
 radarr_session.headers.update({'x-api-key': radarr_key})
 # TODO check if needed
 radarr_session.trust_env = False
-radarr_status = radarr_session.get('{0}/api/system/status'.format(radarr_url))
+radarr_status = radarr_session.get('{0}/radarr/api/v3/system/status'.format(radarr_url))
 status_json = radarr_status.json()
 version = status_json['version']
 logger.info('Connected to radarr at version {}'.format(version))
@@ -209,7 +209,7 @@ isLegacyV2 = version[0] == '2'
 if radarr_status.status_code >= 300:
     logger.error('Status retrieve returned status code {}'.format(radarr_status.status_code))
     sys.exit(2)
-radarr_movies = radarr_session.get('{0}/api/movie'.format(radarr_url))
+radarr_movies = radarr_session.get('{0}/api/v3/movie'.format(radarr_url))
 if radarr_movies.status_code >= 300:
     logger.error('Movies retrieve returned status code {}'.format(radarr_movies.status_code))
     sys.exit(3)
